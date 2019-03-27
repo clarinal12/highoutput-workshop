@@ -14,10 +14,9 @@ import LoginValidation from "./LoginValidation";
 import { FloatRightButton, LoginPanel } from "./styles";
 
 const LoginForm = props => {
-  const { touched, errors, handleChange, handleBlur } = props;
-
-  const invalidEmail = errors.email && touched.email;
-  const invalidPassword = errors.password && touched.password;
+  const { touched, errors, handleChange, handleBlur, isSubmitting } = props;
+  const isInvalidEmail = errors.email && touched.email;
+  const isInvalidPassword = errors.password && touched.password;
 
   return (
     <LoginPanel>
@@ -29,9 +28,9 @@ const LoginForm = props => {
             name="email"
             type="text"
             placeholder="Email"
-            invalid={invalidEmail}
+            invalid={isInvalidEmail}
           />
-          {invalidEmail && (
+          {isInvalidEmail && (
             <FormFeedback>
               <ErrorMessage name="email" />
             </FormFeedback>
@@ -44,35 +43,38 @@ const LoginForm = props => {
             name="password"
             type="password"
             placeholder="Password"
-            invalid={invalidPassword}
+            invalid={isInvalidPassword}
           />
-          {invalidPassword && (
+          {isInvalidPassword && (
             <FormFeedback>
               <ErrorMessage name="password" />
             </FormFeedback>
           )}
         </FormGroup>
-        <center className="mb-3">
+        <FloatRightButton disabled={isSubmitting} type="submit">
+          {isSubmitting ? "Logging In..." : "Login"}
+        </FloatRightButton>
+        <br />
+        <center className="mt-5">
           No account yet? <Link to="/signup">Sign up here.</Link>
         </center>
-        <FloatRightButton type="submit">Submit</FloatRightButton>
       </Form>
     </LoginPanel>
   );
 };
 
 export default withFormik({
-  mapPropsToValues: () => ({
+  mapPropsToValues: props => ({
     email: "",
-    password: ""
+    password: "",
+    login: props.handleLogin
   }),
-  // Handles our submission
   handleSubmit: (values, { setSubmitting }) => {
-    // This is where you could send the submitted values to the backend
-    console.log("Submitted Email:", values.email);
-    console.log("Submitted Password:", values.password);
-    // Simulates the delay of a real request
-    setTimeout(() => setSubmitting(false), 3 * 1000);
+    const { login, email, password } = values;
+    setTimeout(() => {
+      login({ email, password });
+      setSubmitting(false);
+    }, 2 * 1000);
   },
   validationSchema: LoginValidation
 })(LoginForm);
