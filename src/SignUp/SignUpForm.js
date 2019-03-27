@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 //ReactStrap
 import { FormGroup, Input, FormFeedback } from "reactstrap";
@@ -8,18 +7,22 @@ import { FormGroup, Input, FormFeedback } from "reactstrap";
 import { withFormik, ErrorMessage, Form } from "formik";
 
 //Validations
-import LoginValidation from "./LoginValidation";
+import SignUpValidation from "./SignUpValidation";
 
 //Styles
-import { FloatRightButton, LoginPanel } from "./styles";
+import { FloatRightButton, SignUpPanel } from "./styles";
 
-const LoginForm = props => {
+const SignUpForm = props => {
   const { touched, errors, handleChange, handleBlur, isSubmitting } = props;
+
   const isInvalidEmail = errors.email && touched.email;
   const isInvalidPassword = errors.password && touched.password;
+  const isInvalidPasswordConfirmation =
+    errors.passwordConfirmation && touched.passwordConfirmation;
+  const isInvalidFullName = errors.fullName && touched.fullName;
 
   return (
-    <LoginPanel>
+    <SignUpPanel>
       <Form>
         <FormGroup>
           <Input
@@ -51,15 +54,41 @@ const LoginForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
+        <FormGroup>
+          <Input
+            onChange={handleChange}
+            onBlur={handleBlur}
+            name="passwordConfirmation"
+            type="password"
+            placeholder="Re-type Password"
+            invalid={isInvalidPasswordConfirmation}
+          />
+          {isInvalidPasswordConfirmation && (
+            <FormFeedback>
+              <ErrorMessage name="passwordConfirmation" />
+            </FormFeedback>
+          )}
+        </FormGroup>
+        <FormGroup>
+          <Input
+            onChange={handleChange}
+            onBlur={handleBlur}
+            name="fullName"
+            type="text"
+            placeholder="Full Name"
+            invalid={isInvalidFullName}
+          />
+          {isInvalidFullName && (
+            <FormFeedback>
+              <ErrorMessage name="fullName" />
+            </FormFeedback>
+          )}
+        </FormGroup>
         <FloatRightButton disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Logging In..." : "Login"}
-        </FloatRightButton>
-        <br />
-        <center className="mt-5">
-          No account yet? <Link to="/signup">Sign up here.</Link>
-        </center>
+          {isSubmitting ? "Signing Up..." : "Sign Up"}
+        </FloatRightButton>{" "}
       </Form>
-    </LoginPanel>
+    </SignUpPanel>
   );
 };
 
@@ -67,15 +96,17 @@ export default withFormik({
   mapPropsToValues: props => ({
     email: "",
     password: "",
-    login: props.handleLogin
+    passwordConfirmation: "",
+    fullName: "",
+    signup: props.handleSignUp
   }),
   handleSubmit: (values, { setSubmitting }) => {
-    const { login } = values;
+    const { signup } = values;
 
     setTimeout(() => {
-      login(values);
+      signup(values);
       setSubmitting(false);
     }, 2 * 1000);
   },
-  validationSchema: LoginValidation
-})(LoginForm);
+  validationSchema: SignUpValidation
+})(SignUpForm);

@@ -1,6 +1,12 @@
 import React, { Component } from "react";
+
+//Forms
 import LoginForm from "./LoginForm";
+
+//Styles
 import { Wrapper } from "./styles";
+
+//Components
 import DialogModal from "../DialogModal";
 
 class Login extends Component {
@@ -21,7 +27,8 @@ class Login extends Component {
     }));
   }
 
-  login(params) {
+  login(values) {
+    console.log(values);
     this.handleLoginSuccess();
     this.toggleDialogModal();
   }
@@ -36,10 +43,23 @@ class Login extends Component {
 
   getDialogModalProperty(response) {
     if (response === "success")
-      return { type: "success", message: "You have successfully logged in" };
+      return {
+        type: "success",
+        message: "You are now logged in.",
+        title: "Login Success"
+      };
     else if (response === "failed")
-      return { type: "danger", message: "You have failed logged in" };
-    else return { type: "info", message: "Sample Dialog Message" };
+      return {
+        type: "danger",
+        message: "You have failed to log in",
+        title: "Login Fail"
+      };
+    else
+      return {
+        type: "info",
+        message: "Sample Dialog Message",
+        title: "Sample Dialog Title"
+      };
   }
 
   render() {
@@ -51,7 +71,7 @@ class Login extends Component {
         <LoginForm handleLogin={this.login} />
         <DialogModal
           type={dialogModalProperty.type}
-          title="Login Success"
+          title={dialogModalProperty.title}
           centered={true}
           isOpen={dialogModal}
           toggle={this.toggleDialogModal}

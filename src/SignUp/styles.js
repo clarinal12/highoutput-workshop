@@ -12,7 +12,7 @@ const FloatRightButton = styled(Button)`
   float: right;
 `;
 
-const LoginPanel = styled.div`
+const SignUpPanel = styled.div`
   position: relative;
   padding: 4em 1em 1em;
   border: 1px solid #d8d8d8;
@@ -26,8 +26,8 @@ const LoginPanel = styled.div`
     color: #aaa;
     font-size: x-large;
     font-weight: 500;
-    content: "Login";
+    content: "Sign Up";
   }
 `;
 
-export { Wrapper, FloatRightButton, LoginPanel };
+export { Wrapper, FloatRightButton, SignUpPanel };
