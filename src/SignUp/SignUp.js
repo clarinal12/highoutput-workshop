@@ -14,7 +14,8 @@ class SignUp extends Component {
     super(props);
     this.state = {
       dialogModal: false,
-      signUpResponse: null
+      signUpResponse: null,
+      hasError: false
     };
 
     this.toggleDialogModal = this.toggleDialogModal.bind(this);
@@ -29,7 +30,8 @@ class SignUp extends Component {
 
   signup(values) {
     console.log(values);
-    this.handleSignUpSuccess();
+    this.setState({ hasError: false });
+    this.handleSignUpFail();
     this.toggleDialogModal();
   }
 
@@ -38,7 +40,7 @@ class SignUp extends Component {
   }
 
   handleSignUpFail() {
-    this.setState({ signUpResponse: "failed" });
+    this.setState({ signUpResponse: "failed", hasError: true });
   }
 
   getDialogModalProperty(response) {
@@ -63,12 +65,12 @@ class SignUp extends Component {
   }
 
   render() {
-    const { dialogModal, signUpResponse } = this.state;
+    const { dialogModal, signUpResponse, hasError } = this.state;
     const dialogModalProperty = this.getDialogModalProperty(signUpResponse);
 
     return (
       <Wrapper className="container">
-        <SignUpForm handleSignUp={this.signup} />
+        <SignUpForm hasError={hasError} handleSignUp={this.signup} />
         <DialogModal
           type={dialogModalProperty.type}
           title={dialogModalProperty.title}

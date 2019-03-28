@@ -51,7 +51,7 @@ const LoginForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
-        <FloatRightButton disabled={isSubmitting} type="submit">
+        <FloatRightButton color="primary" disabled={isSubmitting} type="submit">
           {isSubmitting ? "Logging In..." : "Login"}
         </FloatRightButton>
         <br />

@@ -1,7 +1,7 @@
 import React from "react";
 
 //ReactStrap
-import { FormGroup, Input, FormFeedback } from "reactstrap";
+import { FormGroup, Input, FormFeedback, Alert } from "reactstrap";
 
 //Formik
 import { withFormik, ErrorMessage, Form } from "formik";
@@ -13,7 +13,14 @@ import SignUpValidation from "./SignUpValidation";
 import { FloatRightButton, SignUpPanel } from "./styles";
 
 const SignUpForm = props => {
-  const { touched, errors, handleChange, handleBlur, isSubmitting } = props;
+  const {
+    touched,
+    errors,
+    handleChange,
+    handleBlur,
+    isSubmitting,
+    hasError
+  } = props;
 
   const isInvalidEmail = errors.email && touched.email;
   const isInvalidPassword = errors.password && touched.password;
@@ -24,6 +31,7 @@ const SignUpForm = props => {
   return (
     <SignUpPanel>
       <Form>
+        {hasError && <Alert color="danger">Some error occured</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
@@ -84,7 +92,7 @@ const SignUpForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
-        <FloatRightButton disabled={isSubmitting} type="submit">
+        <FloatRightButton color="primary" disabled={isSubmitting} type="submit">
           {isSubmitting ? "Signing Up..." : "Sign Up"}
         </FloatRightButton>{" "}
       </Form>
