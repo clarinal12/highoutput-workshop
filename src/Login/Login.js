@@ -16,32 +16,29 @@ class Login extends Component {
       dialogModal: false,
       loginResponse: null
     };
-
-    this.toggleDialogModal = this.toggleDialogModal.bind(this);
-    this.login = this.login.bind(this);
   }
 
-  toggleDialogModal() {
+  toggleDialogModal = () => {
     this.setState(prevState => ({
       dialogModal: !prevState.dialogModal
     }));
-  }
+  };
 
-  login(values) {
+  login = values => {
     console.log(values);
     this.handleLoginSuccess();
     this.toggleDialogModal();
-  }
+  };
 
-  handleLoginSuccess() {
+  handleLoginSuccess = () => {
     this.setState({ loginResponse: "success" });
-  }
+  };
 
-  handleLoginFail() {
+  handleLoginFail = () => {
     this.setState({ loginResponse: "failed" });
-  }
+  };
 
-  getDialogModalProperty(response) {
+  getDialogModalProperty = response => {
     if (response === "success")
       return {
         type: "success",
@@ -60,7 +57,7 @@ class Login extends Component {
         message: "Sample Dialog Message",
         title: "Sample Dialog Title"
       };
-  }
+  };
 
   render() {
     const { dialogModal, loginResponse } = this.state;

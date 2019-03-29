@@ -8,7 +8,7 @@ import { CardBody, CardText, Button } from "reactstrap";
 import { ProductCardFooter, ProductCardTitle, ProductCard } from "./styles";
 
 const ProductsItemCard = props => {
-  const { name, description, quantity, price, id } = props;
+  const { name, description, quantity, price, id, onRemoveClick } = props;
 
   return (
     <ProductCard>
@@ -24,7 +24,9 @@ const ProductsItemCard = props => {
         <Link to={`/products/edit/${id}`}>
           <Button color="link">Edit</Button>
         </Link>
-        <Button color="link">Remove</Button>
+        <Button onClick={() => onRemoveClick(props)} color="link">
+          Remove
+        </Button>
       </ProductCardFooter>
     </ProductCard>
   );

@@ -8,7 +8,8 @@ import { Button, Row, Col, Alert } from "reactstrap";
 import { ProductsWrapper, ProductsPanel } from "./styles";
 
 //Components
-import DialogModal from "../DialogModal";
+import RemoveSuccessModal from "../DialogModal";
+import ConfirmRemoveModal from "../DialogModal";
 import ProductsItemCard from "./ProductsItemCard";
 
 class SignUp extends Component {
@@ -31,35 +32,108 @@ class SignUp extends Component {
           quantity: 12
         }
       ],
-      hasError: false
+      removeSuccessModal: false,
+      confirmRemoveModal: false,
+      hasError: false,
+      errorMessage: "",
+      toBeRemoved: {},
+      removeSuccessMessage: ""
     };
-
-    // this.toggleDialogModal = this.toggleDialogModal.bind(this);
-    // this.login = this.login.bind(this);
   }
 
+  toggleConfirmRemoveModal = () => {
+    this.setState(prevState => ({
+      confirmRemoveModal: !prevState.confirmRemoveModal
+    }));
+  };
+
+  toggleRemoveSuccessModal = () => {
+    this.setState(prevState => ({
+      removeSuccessModal: !prevState.removeSuccessModal
+    }));
+  };
+
+  handleConfirmRemoveProduct = product => {
+    this.setState({ toBeRemoved: product });
+    this.toggleConfirmRemoveModal();
+  };
+
+  removeProduct = product => {
+    this.setState({
+      removeSuccessMessage: `Successfully Removed ${product.name}`,
+      confirmRemoveModal: false
+    });
+    this.handleRemoveSuccess();
+  };
+
+  handleRemoveSuccess = () => {
+    this.toggleRemoveSuccessModal();
+  };
+
+  handleRemoveFail = () => {
+    const { toBeRemoved } = this.state;
+    this.setState({
+      hasError: true,
+      confirmRemoveModal: false,
+      errorMessage: `Failed to delete ${toBeRemoved.name}`
+    });
+  };
+
   render() {
-    const { products, hasError } = this.state;
+    const {
+      products,
+      hasError,
+      removeSuccessModal,
+      confirmRemoveModal,
+      toBeRemoved,
+      removeSuccessMessage,
+      errorMessage
+    } = this.state;
 
     return (
       <ProductsWrapper className="container">
+        <RemoveSuccessModal
+          type="success"
+          title="Remove Product"
+          centered={true}
+          isOpen={removeSuccessModal}
+          toggle={this.toggleRemoveSuccessModal}
+        >
+          <center>{removeSuccessMessage}</center>
+        </RemoveSuccessModal>
+        <ConfirmRemoveModal
+          type="danger"
+          title="Confirm Remove Product"
+          center={true}
+          isOpen={confirmRemoveModal}
+          toggle={this.toggleConfirmRemoveModal}
+          isConfirm={true}
+          onConfirm={() => this.removeProduct(toBeRemoved)}
+        >
+          Are you sure you want to remove the product: {toBeRemoved.name}
+        </ConfirmRemoveModal>
         <ProductsPanel>
           <Link to="/products/create">
             <Button color="primary" className="create-product-button">
               Create New Product
             </Button>
           </Link>
-          {hasError && <Alert color="danger">Some error occured</Alert>}
+          {hasError && (
+            <Alert color="danger">{errorMessage || "Some error occured"}</Alert>
+          )}
           <Row className="card-panel">
             {products.map((product, index) => {
               return (
                 <Col key={index} md="4">
-                  <ProductsItemCard {...product} />
+                  <ProductsItemCard
+                    onRemoveClick={this.handleConfirmRemoveProduct}
+                    {...product}
+                  />
                 </Col>
               );
             })}
           </Row>
-          {products.length == 0 && (
+          {products.length === 0 && (
             <center className="no-products mt-5">
               <h5>No products yet.</h5>
             </center>

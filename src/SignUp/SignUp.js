@@ -17,33 +17,31 @@ class SignUp extends Component {
       signUpResponse: null,
       hasError: false
     };
-
-    this.toggleDialogModal = this.toggleDialogModal.bind(this);
-    this.signup = this.signup.bind(this);
   }
 
-  toggleDialogModal() {
+  toggleDialogModal = () => {
     this.setState(prevState => ({
       dialogModal: !prevState.dialogModal
     }));
-  }
+  };
 
-  signup(values) {
+  signup = values => {
     console.log(values);
     this.setState({ hasError: false });
-    this.handleSignUpFail();
-    this.toggleDialogModal();
-  }
+    this.handleSignUpSuccess();
+  };
 
-  handleSignUpSuccess() {
+  handleSignUpSuccess = () => {
     this.setState({ signUpResponse: "success" });
-  }
+    this.toggleDialogModal();
+  };
 
-  handleSignUpFail() {
+  handleSignUpFail = () => {
     this.setState({ signUpResponse: "failed", hasError: true });
-  }
+    this.toggleDialogModal();
+  };
 
-  getDialogModalProperty(response) {
+  getDialogModalProperty = response => {
     if (response === "success")
       return {
         type: "success",
@@ -62,7 +60,7 @@ class SignUp extends Component {
         message: "Sample Dialog Message",
         title: "Sample Dialog Title"
       };
-  }
+  };
 
   render() {
     const { dialogModal, signUpResponse, hasError } = this.state;
