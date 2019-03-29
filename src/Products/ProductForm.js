@@ -31,7 +31,11 @@ const ProductForm = props => {
     <ProductPanel>
       <h5 className="mb-4">{product.id ? "Edit Product" : "Create Product"}</h5>
       <Form>
-        {hasError && <Alert color="danger">Some error occured</Alert>}
+        {hasError && (
+          <Alert color="danger">{`Failed to ${
+            product.id ? "edit" : "create"
+          } product`}</Alert>
+        )}
         <FormGroup>
           <Input
             onChange={handleChange}

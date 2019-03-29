@@ -31,7 +31,7 @@ const SignUpForm = props => {
   return (
     <SignUpPanel>
       <Form>
-        {hasError && <Alert color="danger">Some error occured</Alert>}
+        {hasError && <Alert color="danger">Failed to sign up</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
