@@ -9,6 +9,44 @@ import { ProductWrapper } from "./styles";
 //Components
 import DialogModal from "../DialogModal";
 
+//Mutations and Queries
+import gql from "graphql-tag";
+import { Mutation } from "react-apollo";
+
+const CREATE_PRODUCT = gql`
+  mutation CreateProduct(
+    $name: String!
+    $description: String!
+    $quantity: Float!
+    $price: Float!
+  ) {
+    createProduct(
+      name: $name
+      description: $description
+      quantity: $quantity
+      price: $price
+    ) {
+      id
+      name
+      description
+      quantity
+      price
+    }
+  }
+`;
+
+const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct($id: ID!, $input: ProductInput!) {
+    updateProduct(id: $id, input: $input) {
+      id
+      name
+      description
+      quantity
+      price
+    }
+  }
+`;
+
 class Product extends Component {
   constructor(props) {
     super(props);
@@ -34,14 +72,16 @@ class Product extends Component {
     };
   }
 
+  handleSuccess = data => {};
+
+  handleError = error => {};
+
   createProduct = params => {
-    console.log(params);
     this.setState({ hasError: false });
     this.handleCreateProductSuccess();
   };
 
   editProduct = params => {
-    console.log(params);
     this.setState({ hasError: false });
     this.handleEditProductSuccess();
   };
@@ -68,29 +108,29 @@ class Product extends Component {
     }));
   };
 
+  componentDidMount() {}
+
   render() {
     const { match } = this.props;
-    const { dialogModal, hasError } = this.state;
+    const { dialogModal } = this.state;
     let product = {
+        id: null,
         name: "",
         description: "",
         quantity: "",
         price: ""
       },
-      submitAction = this.createProduct,
+      productMutation = CREATE_PRODUCT,
       dialogTitle = "Create Success",
       dialogMessage = "You have successfully created a product";
 
     if (match.params.id) {
-      product = this.state.products.filter(
-        prod => Number(prod.id) === Number(match.params.id)
-      );
-      product = product[0];
-      submitAction = this.editProduct;
+      product =
+        (this.props.location.state && this.props.location.state.product) || {};
+      productMutation = UPDATE_PRODUCT;
       dialogTitle = "Edit Success";
       dialogMessage = "You have successfully edited a product";
     }
-
     return (
       <ProductWrapper className="container">
         <DialogModal
@@ -102,11 +142,20 @@ class Product extends Component {
         >
           <center>{dialogMessage}</center>
         </DialogModal>
-        <ProductForm
-          hasError={hasError}
-          handleSubmitAction={submitAction}
-          product={product}
-        />
+        <Mutation
+          mutation={productMutation}
+          onCompleted={data => this.handleSuccess(data)}
+          onError={error => this.handleError(error)}
+        >
+          {(mutateAction, { loading, error }) => (
+            <ProductForm
+              loading={loading}
+              error={error}
+              onSubmit={mutateAction}
+              product={product}
+            />
+          )}
+        </Mutation>
       </ProductWrapper>
     );
   }

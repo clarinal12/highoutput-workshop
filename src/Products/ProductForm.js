@@ -19,9 +19,9 @@ const ProductForm = props => {
     handleChange,
     handleBlur,
     values,
-    isSubmitting,
     product,
-    hasError
+    error,
+    loading
   } = props;
   const isInvalidName = errors.name && touched.name;
   const isInvalidDescription = errors.description && touched.description;
@@ -31,7 +31,7 @@ const ProductForm = props => {
     <ProductPanel>
       <h5 className="mb-4">{product.id ? "Edit Product" : "Create Product"}</h5>
       <Form>
-        {hasError && (
+        {error && (
           <Alert color="danger">{`Failed to ${
             product.id ? "edit" : "create"
           } product`}</Alert>
@@ -73,7 +73,7 @@ const ProductForm = props => {
             onChange={handleChange}
             onBlur={handleBlur}
             name="quantity"
-            type="text"
+            type="number"
             placeholder="Quantity"
             value={values.quantity}
             invalid={isInvalidQuantity}
@@ -89,7 +89,7 @@ const ProductForm = props => {
             onChange={handleChange}
             onBlur={handleBlur}
             name="price"
-            type="text"
+            type="number"
             placeholder="Price"
             value={values.price}
             invalid={isInvalidPrice}
@@ -100,8 +100,8 @@ const ProductForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
-        <FloatRightButton color="primary" disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Submitting..." : "Submit"}
+        <FloatRightButton color="primary" disabled={loading} type="submit">
+          {loading ? "Submitting..." : "Submit"}
         </FloatRightButton>
       </Form>
     </ProductPanel>
@@ -115,14 +115,30 @@ export default withFormik({
     price: props.product.price,
     quantity: props.product.quantity,
     id: props.product.id,
-    submitAction: props.handleSubmitAction
+    mutateAction: props.onSubmit
   }),
-  handleSubmit: (values, { setSubmitting }) => {
-    const { submitAction } = values;
-    setTimeout(() => {
-      submitAction(values);
-      setSubmitting(false);
-    }, 2 * 1000);
+  handleSubmit: values => {
+    const { mutateAction, name, description, price, quantity, id } = values;
+    let data = {};
+    if (id) {
+      data = {
+        id,
+        input: {
+          name,
+          description,
+          price: Number(price),
+          quantity: Number(quantity)
+        }
+      };
+    } else {
+      data = {
+        name,
+        description,
+        price: Number(price),
+        quantity: Number(quantity)
+      };
+    }
+    mutateAction({ variables: { ...data } });
   },
   validationSchema: ProductValidation
 })(ProductForm);

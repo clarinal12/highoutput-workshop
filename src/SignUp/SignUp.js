@@ -9,6 +9,20 @@ import SignUpForm from "./SignUpForm";
 //Components
 import DialogModal from "../DialogModal";
 
+//Mutations and Queries
+import gql from "graphql-tag";
+import { Mutation } from "react-apollo";
+
+const SIGN_UP = gql`
+  mutation Register($name: String!, $email: String!, $password: String!) {
+    register(name: $name, email: $email, password: $password) {
+      id
+      name
+      email
+    }
+  }
+`;
+
 class SignUp extends Component {
   constructor(props) {
     super(props);
@@ -17,6 +31,9 @@ class SignUp extends Component {
       signUpResponse: null,
       hasError: false
     };
+    if (localStorage.getItem("accessToken")) {
+      this.props.history.push("/products");
+    }
   }
 
   toggleDialogModal = () => {
@@ -26,17 +43,16 @@ class SignUp extends Component {
   };
 
   signup = values => {
-    console.log(values);
     this.setState({ hasError: false });
     this.handleSignUpSuccess();
   };
 
-  handleSignUpSuccess = () => {
+  handleSignUpSuccess = data => {
     this.setState({ signUpResponse: "success" });
     this.toggleDialogModal();
   };
 
-  handleSignUpFail = () => {
+  handleSignUpFail = error => {
     this.setState({ signUpResponse: "failed", hasError: true });
     this.toggleDialogModal();
   };
@@ -45,7 +61,7 @@ class SignUp extends Component {
     if (response === "success")
       return {
         type: "success",
-        message: "Your account is now active.",
+        message: "Your account is now active. You can now login",
         title: "Sign Up Success"
       };
     else if (response === "failed")
@@ -63,12 +79,20 @@ class SignUp extends Component {
   };
 
   render() {
-    const { dialogModal, signUpResponse, hasError } = this.state;
+    const { dialogModal, signUpResponse } = this.state;
     const dialogModalProperty = this.getDialogModalProperty(signUpResponse);
 
     return (
       <Wrapper className="container">
-        <SignUpForm hasError={hasError} handleSignUp={this.signup} />
+        <Mutation
+          mutation={SIGN_UP}
+          onCompleted={data => this.handleSignUpSuccess(data)}
+          onError={error => this.handleSignUpFail(error)}
+        >
+          {(register, { loading, error }) => (
+            <SignUpForm loading={loading} error={error} onSubmit={register} />
+          )}
+        </Mutation>
         <DialogModal
           type={dialogModalProperty.type}
           title={dialogModalProperty.title}

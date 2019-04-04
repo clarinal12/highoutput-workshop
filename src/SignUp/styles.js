@@ -12,6 +12,10 @@ const FloatRightButton = styled(Button)`
   float: right;
 `;
 
+const FloatLeftButton = styled(Button)`
+  float: left;
+`;
+
 const SignUpPanel = styled.div`
   position: relative;
   padding: 4em 1em 1em;
@@ -30,4 +34,4 @@ const SignUpPanel = styled.div`
   }
 `;
 
-export { Wrapper, FloatRightButton, SignUpPanel };
+export { Wrapper, FloatRightButton, FloatLeftButton, SignUpPanel };

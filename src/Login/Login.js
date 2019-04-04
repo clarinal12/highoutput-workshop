@@ -9,6 +9,16 @@ import { Wrapper } from "./styles";
 //Components
 import DialogModal from "../DialogModal";
 
+//Mutations and Queries
+import gql from "graphql-tag";
+import { Mutation } from "react-apollo";
+
+const LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password)
+  }
+`;
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +26,9 @@ class Login extends Component {
       dialogModal: false,
       loginResponse: null
     };
+    if (localStorage.getItem("accessToken")) {
+      this.props.history.push("/products");
+    }
   }
 
   toggleDialogModal = () => {
@@ -24,18 +37,16 @@ class Login extends Component {
     }));
   };
 
-  login = values => {
-    console.log(values);
-    this.handleLoginSuccess();
-    this.toggleDialogModal();
+  handleLoginSuccess = data => {
+    localStorage.setItem("accessToken", data.login);
+    this.props.history.push("/products");
+    // this.setState({ loginResponse: "success" });
+    // this.toggleDialogModal();
   };
 
-  handleLoginSuccess = () => {
-    this.setState({ loginResponse: "success" });
-  };
-
-  handleLoginFail = () => {
+  handleLoginFail = error => {
     this.setState({ loginResponse: "failed" });
+    this.toggleDialogModal();
   };
 
   getDialogModalProperty = response => {
@@ -65,7 +76,15 @@ class Login extends Component {
 
     return (
       <Wrapper className="container">
-        <LoginForm handleLogin={this.login} />
+        <Mutation
+          mutation={LOGIN}
+          onCompleted={data => this.handleLoginSuccess(data)}
+          onError={error => this.handleLoginFail(error)}
+        >
+          {(login, { loading, error }) => (
+            <LoginForm loading={loading} error={error} onSubmit={login} />
+          )}
+        </Mutation>
         <DialogModal
           type={dialogModalProperty.type}
           title={dialogModalProperty.title}

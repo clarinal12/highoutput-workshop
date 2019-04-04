@@ -9,6 +9,7 @@ import { ProductCardFooter, ProductCardTitle, ProductCard } from "./styles";
 
 const ProductsItemCard = props => {
   const { name, description, quantity, price, id, onRemoveClick } = props;
+  const product = { name, description, quantity, price, id };
 
   return (
     <ProductCard>
@@ -21,7 +22,14 @@ const ProductsItemCard = props => {
         <CardText className="product-quantity">{quantity} items</CardText>
       </CardBody>
       <ProductCardFooter>
-        <Link to={`/products/edit/${id}`}>
+        <Link
+          to={{
+            pathname: `/products/edit/${id}`,
+            state: {
+              product
+            }
+          }}
+        >
           <Button color="link">Edit</Button>
         </Link>
         <Button onClick={() => onRemoveClick(props)} color="link">

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
 
 //Pages
 import Login from "./Login";
@@ -30,9 +31,9 @@ class App extends Component {
         <Route exact path="/" component={Index} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/signup" component={SignUp} />
-        <Route exact path="/products" component={Products} />
-        <Route path="/products/create" component={Product} />
-        <Route path="/products/edit/:id" component={Product} />
+        <ProtectedRoute exact path="/products" component={Products} />
+        <ProtectedRoute path="/products/create" component={Product} />
+        <ProtectedRoute path="/products/edit/:id" component={Product} />
       </Router>
     );
   }

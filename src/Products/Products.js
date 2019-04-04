@@ -12,26 +12,33 @@ import RemoveSuccessModal from "../DialogModal";
 import ConfirmRemoveModal from "../DialogModal";
 import ProductsItemCard from "./ProductsItemCard";
 
+//Mutations and Queries
+import gql from "graphql-tag";
+import { Query, Mutation } from "react-apollo";
+
+const PRODUCTS = gql`
+  {
+    products {
+      id
+      name
+      description
+      quantity
+      price
+    }
+  }
+`;
+
+const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($id: ID!) {
+    deleteProduct(id: $id)
+  }
+`;
+
 class SignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: [
-        {
-          id: 1,
-          name: "Product 1",
-          price: 100,
-          description: "Sample description for product 1",
-          quantity: 20
-        },
-        {
-          id: 2,
-          name: "Product 2",
-          price: 44,
-          description: "Sample description for product 2",
-          quantity: 12
-        }
-      ],
+      // products: [],
       removeSuccessModal: false,
       confirmRemoveModal: false,
       hasError: false,
@@ -58,15 +65,12 @@ class SignUp extends Component {
     this.toggleConfirmRemoveModal();
   };
 
-  removeProduct = product => {
+  handleRemoveSuccess = () => {
+    const { toBeRemoved } = this.state;
     this.setState({
-      removeSuccessMessage: `Successfully Removed ${product.name}`,
+      removeSuccessMessage: `Successfully Removed ${toBeRemoved.name}`,
       confirmRemoveModal: false
     });
-    this.handleRemoveSuccess();
-  };
-
-  handleRemoveSuccess = () => {
     this.toggleRemoveSuccessModal();
   };
 
@@ -81,13 +85,12 @@ class SignUp extends Component {
 
   render() {
     const {
-      products,
-      hasError,
       removeSuccessModal,
       confirmRemoveModal,
       toBeRemoved,
       removeSuccessMessage,
-      errorMessage
+      errorMessage,
+      hasError
     } = this.state;
 
     return (
@@ -101,43 +104,71 @@ class SignUp extends Component {
         >
           <center>{removeSuccessMessage}</center>
         </RemoveSuccessModal>
-        <ConfirmRemoveModal
-          type="danger"
-          title="Confirm Remove Product"
-          center={true}
-          isOpen={confirmRemoveModal}
-          toggle={this.toggleConfirmRemoveModal}
-          isConfirm={true}
-          onConfirm={() => this.removeProduct(toBeRemoved)}
+        <Mutation
+          mutation={DELETE_PRODUCT}
+          onCompleted={data => this.handleRemoveSuccess()}
+          onError={error => this.handleRemoveFail()}
         >
-          Are you sure you want to remove the product: {toBeRemoved.name}
-        </ConfirmRemoveModal>
+          {deleteProduct => (
+            <ConfirmRemoveModal
+              type="danger"
+              title="Confirm Remove Product"
+              center={true}
+              isOpen={confirmRemoveModal}
+              toggle={this.toggleConfirmRemoveModal}
+              isConfirm={true}
+              onConfirm={() =>
+                deleteProduct({ variables: { id: toBeRemoved.id } })
+              }
+            >
+              Are you sure you want to remove the product: {toBeRemoved.name}
+            </ConfirmRemoveModal>
+          )}
+        </Mutation>
         <ProductsPanel>
           <Link to="/products/create">
             <Button color="primary" className="create-product-button">
               Create New Product
             </Button>
           </Link>
-          {hasError && (
-            <Alert color="danger">{errorMessage || "Some error occured"}</Alert>
-          )}
-          <Row className="card-panel">
-            {products.map((product, index) => {
-              return (
-                <Col key={index} md="4">
-                  <ProductsItemCard
-                    onRemoveClick={this.handleConfirmRemoveProduct}
-                    {...product}
-                  />
-                </Col>
-              );
-            })}
-          </Row>
-          {products.length === 0 && (
-            <center className="no-products mt-5">
-              <h5>No products yet.</h5>
-            </center>
-          )}
+          {hasError && <Alert color="danger">{errorMessage}</Alert>}
+          <Query query={PRODUCTS} pollInterval={1500}>
+            {({ loading, error, data }) => {
+              if (loading) {
+                return (
+                  <center className="no-products mt-5">
+                    <h5>Fetching Products...</h5>
+                  </center>
+                );
+              }
+              if (error) {
+                return <Alert color="danger">{error.message}</Alert>;
+              }
+              if (data.products.length === 0) {
+                return (
+                  <center className="no-products mt-5">
+                    <h5>No products yet.</h5>
+                  </center>
+                );
+              }
+              if (data) {
+                return (
+                  <Row className="card-panel">
+                    {data.products.map((product, index) => {
+                      return (
+                        <Col key={index} md="4">
+                          <ProductsItemCard
+                            onRemoveClick={this.handleConfirmRemoveProduct}
+                            {...product}
+                          />
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                );
+              }
+            }}
+          </Query>
         </ProductsPanel>
       </ProductsWrapper>
     );

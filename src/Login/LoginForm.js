@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 //ReactStrap
-import { FormGroup, Input, FormFeedback } from "reactstrap";
+import { FormGroup, Input, FormFeedback, Alert } from "reactstrap";
 
 //Formik
 import { withFormik, ErrorMessage, Form } from "formik";
@@ -14,13 +14,13 @@ import LoginValidation from "./LoginValidation";
 import { FloatRightButton, LoginPanel } from "./styles";
 
 const LoginForm = props => {
-  const { touched, errors, handleChange, handleBlur, isSubmitting } = props;
+  const { touched, errors, handleChange, handleBlur, loading, error } = props;
   const isInvalidEmail = errors.email && touched.email;
   const isInvalidPassword = errors.password && touched.password;
-
   return (
     <LoginPanel>
       <Form>
+        {error && <Alert color="danger">Failed to sign up</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
@@ -51,8 +51,8 @@ const LoginForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
-        <FloatRightButton color="primary" disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Logging In..." : "Login"}
+        <FloatRightButton color="primary" disabled={loading} type="submit">
+          {loading ? "Logging In..." : "Login"}
         </FloatRightButton>
         <br />
         <center className="mt-5">
@@ -67,15 +67,11 @@ export default withFormik({
   mapPropsToValues: props => ({
     email: "",
     password: "",
-    login: props.handleLogin
+    login: props.onSubmit
   }),
-  handleSubmit: (values, { setSubmitting }) => {
-    const { login } = values;
-
-    setTimeout(() => {
-      login(values);
-      setSubmitting(false);
-    }, 2 * 1000);
+  handleSubmit: values => {
+    const { login, email, password } = values;
+    login({ variables: { email, password } });
   },
   validationSchema: LoginValidation
 })(LoginForm);

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 //ReactStrap
 import { FormGroup, Input, FormFeedback, Alert } from "reactstrap";
@@ -10,28 +11,21 @@ import { withFormik, ErrorMessage, Form } from "formik";
 import SignUpValidation from "./SignUpValidation";
 
 //Styles
-import { FloatRightButton, SignUpPanel } from "./styles";
+import { FloatRightButton, FloatLeftButton, SignUpPanel } from "./styles";
 
 const SignUpForm = props => {
-  const {
-    touched,
-    errors,
-    handleChange,
-    handleBlur,
-    isSubmitting,
-    hasError
-  } = props;
+  const { touched, errors, handleChange, handleBlur, error, loading } = props;
 
   const isInvalidEmail = errors.email && touched.email;
   const isInvalidPassword = errors.password && touched.password;
   const isInvalidPasswordConfirmation =
     errors.passwordConfirmation && touched.passwordConfirmation;
-  const isInvalidFullName = errors.fullName && touched.fullName;
+  const isInvalidName = errors.name && touched.name;
 
   return (
     <SignUpPanel>
       <Form>
-        {hasError && <Alert color="danger">Failed to sign up</Alert>}
+        {error && <Alert color="danger">Failed to sign up</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
@@ -81,19 +75,24 @@ const SignUpForm = props => {
           <Input
             onChange={handleChange}
             onBlur={handleBlur}
-            name="fullName"
+            name="name"
             type="text"
             placeholder="Full Name"
-            invalid={isInvalidFullName}
+            invalid={isInvalidName}
           />
-          {isInvalidFullName && (
+          {isInvalidName && (
             <FormFeedback>
-              <ErrorMessage name="fullName" />
+              <ErrorMessage name="name" />
             </FormFeedback>
           )}
         </FormGroup>
-        <FloatRightButton color="primary" disabled={isSubmitting} type="submit">
-          {isSubmitting ? "Signing Up..." : "Sign Up"}
+        <Link to="/login">
+          <FloatLeftButton color="link" type="button">
+            Log In
+          </FloatLeftButton>
+        </Link>
+        <FloatRightButton color="primary" disabled={loading} type="submit">
+          {loading ? "Signing Up..." : "Sign Up"}
         </FloatRightButton>{" "}
       </Form>
     </SignUpPanel>
@@ -105,16 +104,12 @@ export default withFormik({
     email: "",
     password: "",
     passwordConfirmation: "",
-    fullName: "",
-    signup: props.handleSignUp
+    name: "",
+    signup: props.onSubmit
   }),
-  handleSubmit: (values, { setSubmitting }) => {
-    const { signup } = values;
-
-    setTimeout(() => {
-      signup(values);
-      setSubmitting(false);
-    }, 2 * 1000);
+  handleSubmit: values => {
+    const { signup, email, password, name } = values;
+    signup({ variables: { email, password, name } });
   },
   validationSchema: SignUpValidation
 })(SignUpForm);

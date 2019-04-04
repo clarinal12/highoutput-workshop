@@ -6,10 +6,12 @@ const ProductValidation = yup.object().shape({
   quantity: yup
     .number()
     .typeError("quantity must be a number")
+    .positive()
     .required(),
   price: yup
     .number()
     .typeError("price must be a number")
+    .positive()
     .required()
 });
 

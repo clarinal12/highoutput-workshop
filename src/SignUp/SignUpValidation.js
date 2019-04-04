@@ -17,7 +17,7 @@ const SignUpValidation = yup.object().shape({
     .max(16, "password confirmation must be at most 16 characters")
     .oneOf([yup.ref("password"), null], "passwords must match")
     .required("password confirmation is a required field"),
-  fullName: yup.string().required("full name is a required field")
+  name: yup.string().required("full name is a required field")
 });
 
 export default SignUpValidation;
