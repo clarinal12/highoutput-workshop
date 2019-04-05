@@ -20,7 +20,7 @@ const LoginForm = props => {
   return (
     <LoginPanel>
       <Form>
-        {error && <Alert color="danger">Failed to sign up</Alert>}
+        {error && <Alert color="danger">{error.message}</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}

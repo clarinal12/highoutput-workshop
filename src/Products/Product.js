@@ -10,96 +10,44 @@ import { ProductWrapper } from "./styles";
 import DialogModal from "../DialogModal";
 
 //Mutations and Queries
-import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
-
-const CREATE_PRODUCT = gql`
-  mutation CreateProduct(
-    $name: String!
-    $description: String!
-    $quantity: Float!
-    $price: Float!
-  ) {
-    createProduct(
-      name: $name
-      description: $description
-      quantity: $quantity
-      price: $price
-    ) {
-      id
-      name
-      description
-      quantity
-      price
-    }
-  }
-`;
-
-const UPDATE_PRODUCT = gql`
-  mutation UpdateProduct($id: ID!, $input: ProductInput!) {
-    updateProduct(id: $id, input: $input) {
-      id
-      name
-      description
-      quantity
-      price
-    }
-  }
-`;
+import { CREATE_PRODUCT, UPDATE_PRODUCT } from "../Constants/QueryTemplates";
 
 class Product extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: [
-        {
-          id: 1,
-          name: "Product 1",
-          price: 100,
-          description: "Sample description for product 1",
-          quantity: 20
-        },
-        {
-          id: 2,
-          name: "Product 2",
-          price: 44,
-          description: "Sample description for product 2",
-          quantity: 12
-        }
-      ],
       dialogModal: false,
-      hasError: false
+      dialogType: "success",
+      dialogTitle: "",
+      dialogMessage: ""
     };
   }
 
-  handleSuccess = data => {};
+  handleSuccess = data => {
+    const { match } = this.props;
 
-  handleError = error => {};
-
-  createProduct = params => {
-    this.setState({ hasError: false });
-    this.handleCreateProductSuccess();
+    this.setState({
+      dialogType: "success",
+      dialogTitle: `${match.params.id ? "Edit" : "Create"} Product Success`,
+      dialogMessage: `You have successfully ${
+        match.params.id ? "edited" : "created"
+      } a product`,
+      dialogModal: true
+    });
   };
 
-  editProduct = params => {
-    this.setState({ hasError: false });
-    this.handleEditProductSuccess();
-  };
+  handleError = error => {
+    const { match } = this.props;
 
-  handleCreateProductSuccess = () => {
-    this.toggleDialogModal();
-  };
-
-  handleCreateProductFail = () => {
-    this.setState({ hasError: true });
-  };
-
-  handleEditProductSuccess = () => {
-    this.toggleDialogModal();
-  };
-
-  handleEditProductFail = () => {
-    this.setState({ hasError: true });
+    this.setState({
+      dialogType: "danger",
+      dialogTitle: `${match.params.id ? "Edit" : "Create"} Product Failed`,
+      dialogMessage: `You have failed ${
+        match.params.id ? "edited" : "created"
+      } a product`,
+      dialogModal: true
+    });
   };
 
   toggleDialogModal = () => {
@@ -108,11 +56,9 @@ class Product extends Component {
     }));
   };
 
-  componentDidMount() {}
-
   render() {
     const { match } = this.props;
-    const { dialogModal } = this.state;
+    const { dialogModal, dialogMessage, dialogTitle, dialogType } = this.state;
     let product = {
         id: null,
         name: "",
@@ -120,21 +66,18 @@ class Product extends Component {
         quantity: "",
         price: ""
       },
-      productMutation = CREATE_PRODUCT,
-      dialogTitle = "Create Success",
-      dialogMessage = "You have successfully created a product";
+      productMutation = CREATE_PRODUCT;
 
     if (match.params.id) {
       product =
         (this.props.location.state && this.props.location.state.product) || {};
       productMutation = UPDATE_PRODUCT;
-      dialogTitle = "Edit Success";
-      dialogMessage = "You have successfully edited a product";
     }
+
     return (
       <ProductWrapper className="container">
         <DialogModal
-          type="success"
+          type={dialogType}
           title={dialogTitle}
           centered={true}
           isOpen={dialogModal}

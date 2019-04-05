@@ -27,15 +27,12 @@ const ProductForm = props => {
   const isInvalidDescription = errors.description && touched.description;
   const isInvalidPrice = errors.price && touched.price;
   const isInvalidQuantity = errors.quantity && touched.quantity;
+
   return (
     <ProductPanel>
       <h5 className="mb-4">{product.id ? "Edit Product" : "Create Product"}</h5>
       <Form>
-        {error && (
-          <Alert color="danger">{`Failed to ${
-            product.id ? "edit" : "create"
-          } product`}</Alert>
-        )}
+        {error && <Alert color="danger">{error.message}</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
@@ -117,7 +114,7 @@ export default withFormik({
     id: props.product.id,
     mutateAction: props.onSubmit
   }),
-  handleSubmit: values => {
+  handleSubmit: async (values, { resetForm }) => {
     const { mutateAction, name, description, price, quantity, id } = values;
     let data = {};
     if (id) {
@@ -138,7 +135,8 @@ export default withFormik({
         quantity: Number(quantity)
       };
     }
-    mutateAction({ variables: { ...data } });
+    const response = await mutateAction({ variables: { ...data } });
+    if (response && !id) resetForm();
   },
   validationSchema: ProductValidation
 })(ProductForm);

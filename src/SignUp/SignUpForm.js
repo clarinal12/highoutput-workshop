@@ -14,7 +14,15 @@ import SignUpValidation from "./SignUpValidation";
 import { FloatRightButton, FloatLeftButton, SignUpPanel } from "./styles";
 
 const SignUpForm = props => {
-  const { touched, errors, handleChange, handleBlur, error, loading } = props;
+  const {
+    touched,
+    errors,
+    handleChange,
+    handleBlur,
+    values,
+    error,
+    loading
+  } = props;
 
   const isInvalidEmail = errors.email && touched.email;
   const isInvalidPassword = errors.password && touched.password;
@@ -25,7 +33,7 @@ const SignUpForm = props => {
   return (
     <SignUpPanel>
       <Form>
-        {error && <Alert color="danger">Failed to sign up</Alert>}
+        {error && <Alert color="danger">{error.message}</Alert>}
         <FormGroup>
           <Input
             onChange={handleChange}
@@ -33,6 +41,7 @@ const SignUpForm = props => {
             name="email"
             type="email"
             placeholder="Email"
+            value={values.email}
             invalid={isInvalidEmail}
           />
           {isInvalidEmail && (
@@ -48,6 +57,7 @@ const SignUpForm = props => {
             name="password"
             type="password"
             placeholder="Password"
+            value={values.password}
             invalid={isInvalidPassword}
           />
           {isInvalidPassword && (
@@ -63,6 +73,7 @@ const SignUpForm = props => {
             name="passwordConfirmation"
             type="password"
             placeholder="Re-type Password"
+            value={values.passwordConfirmation}
             invalid={isInvalidPasswordConfirmation}
           />
           {isInvalidPasswordConfirmation && (
@@ -78,6 +89,7 @@ const SignUpForm = props => {
             name="name"
             type="text"
             placeholder="Full Name"
+            value={values.name}
             invalid={isInvalidName}
           />
           {isInvalidName && (
@@ -107,9 +119,10 @@ export default withFormik({
     name: "",
     signup: props.onSubmit
   }),
-  handleSubmit: values => {
+  handleSubmit: async (values, { resetForm }) => {
     const { signup, email, password, name } = values;
-    signup({ variables: { email, password, name } });
+    const response = await signup({ variables: { email, password, name } });
+    if (response) resetForm();
   },
   validationSchema: SignUpValidation
 })(SignUpForm);

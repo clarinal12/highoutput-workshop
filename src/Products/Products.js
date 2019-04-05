@@ -13,32 +13,13 @@ import ConfirmRemoveModal from "../DialogModal";
 import ProductsItemCard from "./ProductsItemCard";
 
 //Mutations and Queries
-import gql from "graphql-tag";
 import { Query, Mutation } from "react-apollo";
-
-const PRODUCTS = gql`
-  {
-    products {
-      id
-      name
-      description
-      quantity
-      price
-    }
-  }
-`;
-
-const DELETE_PRODUCT = gql`
-  mutation DeleteProduct($id: ID!) {
-    deleteProduct(id: $id)
-  }
-`;
+import { PRODUCTS, DELETE_PRODUCT } from "../Constants/QueryTemplates";
 
 class SignUp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // products: [],
       removeSuccessModal: false,
       confirmRemoveModal: false,
       hasError: false,
@@ -132,7 +113,7 @@ class SignUp extends Component {
             </Button>
           </Link>
           {hasError && <Alert color="danger">{errorMessage}</Alert>}
-          <Query query={PRODUCTS} pollInterval={1500}>
+          <Query query={PRODUCTS} pollInterval={1000}>
             {({ loading, error, data }) => {
               if (loading) {
                 return (

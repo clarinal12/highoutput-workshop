@@ -10,18 +10,8 @@ import SignUpForm from "./SignUpForm";
 import DialogModal from "../DialogModal";
 
 //Mutations and Queries
-import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
-
-const SIGN_UP = gql`
-  mutation Register($name: String!, $email: String!, $password: String!) {
-    register(name: $name, email: $email, password: $password) {
-      id
-      name
-      email
-    }
-  }
-`;
+import { SIGN_UP } from "../Constants/QueryTemplates";
 
 class SignUp extends Component {
   constructor(props) {
@@ -40,11 +30,6 @@ class SignUp extends Component {
     this.setState(prevState => ({
       dialogModal: !prevState.dialogModal
     }));
-  };
-
-  signup = values => {
-    this.setState({ hasError: false });
-    this.handleSignUpSuccess();
   };
 
   handleSignUpSuccess = data => {
