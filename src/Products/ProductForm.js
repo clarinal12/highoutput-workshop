@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 //ReactStrap
 import { FormGroup, Input, FormFeedback, Alert } from "reactstrap";
@@ -10,7 +11,10 @@ import { withFormik, ErrorMessage, Form } from "formik";
 import ProductValidation from "./ProductValidation";
 
 //Styles
-import { FloatRightButton, ProductPanel } from "./styles";
+import { FloatRightButton, FloatLeftButton, ProductPanel } from "./styles";
+
+//Mutations and Queries
+import { PRODUCTS } from "../Constants/QueryTemplates";
 
 const ProductForm = props => {
   const {
@@ -97,6 +101,11 @@ const ProductForm = props => {
             </FormFeedback>
           )}
         </FormGroup>
+        <Link to="/products">
+          <FloatLeftButton color="link" type="button">
+            Back
+          </FloatLeftButton>
+        </Link>
         <FloatRightButton color="primary" disabled={loading} type="submit">
           {loading ? "Submitting..." : "Submit"}
         </FloatRightButton>
@@ -135,7 +144,10 @@ export default withFormik({
         quantity: Number(quantity)
       };
     }
-    const response = await mutateAction({ variables: { ...data } });
+    const response = await mutateAction({
+      variables: { ...data },
+      refetchQueries: [{ query: PRODUCTS }]
+    });
     if (response && !id) resetForm();
   },
   validationSchema: ProductValidation

@@ -99,7 +99,10 @@ class SignUp extends Component {
               toggle={this.toggleConfirmRemoveModal}
               isConfirm={true}
               onConfirm={() =>
-                deleteProduct({ variables: { id: toBeRemoved.id } })
+                deleteProduct({
+                  variables: { id: toBeRemoved.id },
+                  refetchQueries: [{ query: PRODUCTS }]
+                })
               }
             >
               Are you sure you want to remove the product: {toBeRemoved.name}
@@ -113,7 +116,7 @@ class SignUp extends Component {
             </Button>
           </Link>
           {hasError && <Alert color="danger">{errorMessage}</Alert>}
-          <Query query={PRODUCTS} pollInterval={1000}>
+          <Query query={PRODUCTS}>
             {({ loading, error, data }) => {
               if (loading) {
                 return (

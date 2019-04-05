@@ -20,6 +20,10 @@ const FloatRightButton = styled(Button)`
   float: right;
 `;
 
+const FloatLeftButton = styled(Button)`
+  float: left;
+`;
+
 const ProductsPanel = styled.div`
   position: relative;
   padding: 5em 1em 1em;
@@ -92,6 +96,7 @@ export {
   ProductsWrapper,
   ProductWrapper,
   FloatRightButton,
+  FloatLeftButton,
   ProductsPanel,
   ProductPanel,
   ProductCardFooter,
